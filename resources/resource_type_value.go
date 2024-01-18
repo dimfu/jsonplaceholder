@@ -10,7 +10,10 @@ type ResourceTypeValue struct {
 }
 
 func (r *ResourceTypeValue) String() string {
-	return fmt.Sprintf("%d", *r)
+	if r.Value == nil {
+		return ""
+	}
+	return string(*r.Value)
 }
 
 func (r *ResourceTypeValue) Set(value string) error {
@@ -28,7 +31,12 @@ func (r *ResourceTypeValue) Set(value string) error {
 	case "users":
 		*r.Value = Users
 	default:
-		return fmt.Errorf("invalid resource type: %s", value)
+		return fmt.Errorf("invalid resource types: %s", value)
 	}
+
+	if string(*r.Value) != value {
+		return fmt.Errorf("provided resource type (%s) does not match expected resource type", value)
+	}
+
 	return nil
 }

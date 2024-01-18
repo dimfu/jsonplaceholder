@@ -30,11 +30,6 @@ var (
 	}
 )
 
-func IsValidResource(r ResourceType) bool {
-	_, valid := validResources[r]
-	return valid
-}
-
 func GetResource(r ResourceType) interface{} {
 	res, err := http.Get(jphUrl + "/" + string(r))
 
@@ -63,5 +58,9 @@ func GetResource(r ResourceType) interface{} {
 		resources = append(resources, d)
 	}
 
+	return resources
+}
+
+func FilterResourceProperties(resources interface{}) interface{} {
 	return resources
 }

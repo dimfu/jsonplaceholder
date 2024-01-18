@@ -4,29 +4,45 @@ import (
 	"flag"
 	"jsonplaceholder/resources"
 	"log"
+	"os"
 
 	"github.com/gookit/goutil/dump"
 )
 
-var resourceArg resources.ResourceType
+var (
+	resourceArg resources.ResourceType
+	filterArg   string
+)
 
 func init() {
 	flag.Var(&resources.ResourceTypeValue{Value: &resourceArg}, "res", "specify resource type")
+	flag.StringVar(&filterArg, "f", "", "filter resources properties, can use multiple values")
 }
 
 func main() {
-	flag.Parse()
-	flag.VisitAll(func(f *flag.Flag) {
-		if f.Value.String() == "" {
-			log.Fatal(f.Name, " flag is required")
-		}
-	})
+	firstArgWithDash := 1
 
-	if !resources.IsValidResource(resourceArg) {
-		log.Fatal("invalid resource type: ", resourceArg)
+	for i := 0; i < len(os.Args); i++ {
+		firstArgWithDash = i
+
+		if len(os.Args[i]) > 0 && os.Args[i][0] == '-' {
+			break
+		}
+	}
+	flag.CommandLine.Parse(os.Args[firstArgWithDash:])
+	command := os.Args[1]
+
+	if firstArgWithDash != 2 {
+		log.Fatal("usage: jsonplaceholder <command>")
 	}
 
-	resource := resources.GetResource(resourceArg)
+	switch command {
+	case "resources":
+		rs := resources.GetResource(resourceArg)
+		filteredResources := resources.FilterResourceProperties(rs)
 
-	dump.P(resource)
+		dump.P(filteredResources)
+	default:
+		log.Fatal("no command found for this")
+	}
 }
