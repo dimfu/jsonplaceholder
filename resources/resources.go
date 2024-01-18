@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
 type ResourceType string
@@ -18,19 +20,9 @@ const (
 	Users    ResourceType = "users"
 )
 
-var (
-	jphUrl         = "https://jsonplaceholder.typicode.com"
-	validResources = map[ResourceType]struct{}{
-		Posts:    {},
-		Comments: {},
-		Albums:   {},
-		Photos:   {},
-		Todos:    {},
-		Users:    {},
-	}
-)
+var jphUrl = "https://jsonplaceholder.typicode.com"
 
-func GetResource(r ResourceType) interface{} {
+func GetResources(r ResourceType) []interface{} {
 	res, err := http.Get(jphUrl + "/" + string(r))
 
 	if err != nil {
@@ -61,6 +53,7 @@ func GetResource(r ResourceType) interface{} {
 	return resources
 }
 
-func FilterResourceProperties(resources interface{}) interface{} {
-	return resources
+func PickRandomResource(rs []interface{}) interface{} {
+	var randomizer = rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
+	return rs[randomizer.Intn(len(rs))]
 }

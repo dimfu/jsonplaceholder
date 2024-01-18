@@ -32,16 +32,19 @@ func main() {
 	flag.CommandLine.Parse(os.Args[firstArgWithDash:])
 	command := os.Args[1]
 
+	// handle single resource
 	if firstArgWithDash != 2 {
-		log.Fatal("usage: jsonplaceholder <command>")
+		rs := resources.GetResources(resourceArg)
+		r := resources.PickRandomResource(rs)
+
+		dump.P(r)
+		os.Exit(1)
 	}
 
 	switch command {
-	case "resources":
-		rs := resources.GetResource(resourceArg)
-		filteredResources := resources.FilterResourceProperties(rs)
-
-		dump.P(filteredResources)
+	case "resources": // get all resources
+		rs := resources.GetResources(resourceArg)
+		dump.P(rs)
 	default:
 		log.Fatal("no command found for this")
 	}
